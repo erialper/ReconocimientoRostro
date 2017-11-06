@@ -1,4 +1,4 @@
-# Reconocedor Rostro
+# Reconocimiento de Rostro
 
 Requerimientos:
 
