@@ -9,34 +9,39 @@ capture = cv2.VideoCapture("videos/Video1.wmv")
 #Captura de video desde cámara
 #capture = cv2.VideoCapture(0)
 
-
 #Presentación de las diferentes imágenes y la señal de video
 cv2.namedWindow("Video:", cv2.WINDOW_AUTOSIZE)
 #Ventanas adicionales
-cv2.namedWindow("Video en escala de grises:", cv2.WINDOW_AUTOSIZE)
+#cv2.namedWindow("Video en escala de grises:", cv2.WINDOW_AUTOSIZE)
 
 while(True):
 
     #Lectura del frame desde la señal de video (cámara o archivo de video)
     ret, frame = capture.read()
+
     #Si llega al final del video no habrá frame
     if(not ret):
       break
 
+    #Rotar el video
+    num_rows, num_cols = frame.shape[:2]
+    rotation_matrix = cv2.getRotationMatrix2D((num_cols / 2, num_rows / 2), 90, 1)
+    img_rotation = cv2.warpAffine(frame, rotation_matrix, (num_cols, num_rows))
+
     #Convertir a escala de grises
-    frameGris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #frameGris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     #buscamos las coordenadas de los rostros (si los hay) y
     #guardamos su posicion
-    faces = face_cascade.detectMultiScale(frameGris, 1.3, 5)
+    faces = face_cascade.detectMultiScale(img_rotation, 1.3, 5)
 
     # Dibujamos un rectangulo en las coordenadas de cada rostro
     for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (125, 255, 0), 2)
+        cv2.rectangle(img_rotation, (x, y), (x + w, y + h), (125, 255, 0), 2)
 
     #Muestra el video resultante en su respectiva ventana
-    cv2.imshow("Video:",frame)
-    cv2.imshow("Video en escala de grises:",frameGris)
+    cv2.imshow("Video:",img_rotation)
+    #cv2.imshow("Video en escala de grises:",frameGris)
 
     key = cv2.waitKey(33) #Retraso en milisegundos para leer el siguiente frame (nota para archivo de imagen poner 0 )
     #Termina presionando la tecla Esc
@@ -44,4 +49,5 @@ while(True):
         break
 
 cv2.waitKey(0)
+capture.release()
 cv2.destroyAllWindows()
